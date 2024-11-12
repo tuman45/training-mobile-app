@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:training/widget/base_state.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+// import 'package:cached_network_image/cached_network_image.dart';
 
 class ProfilPage extends StatefulWidget {
   final String routes = "/profil_page";
@@ -24,11 +25,13 @@ class _ProfilPageState extends BaseStatefulState<ProfilPage> {
 
   // Variable to store the fetched images
   List<String> randomImages = [];
+  List<String> randomImages1 = [];
+  List<String> randomImages2 = [];
 
   // Fetch random images from an API
   Future<void> fetchRandomImages() async {
     final response = await http
-        .get(Uri.parse('https://picsum.photos/v2/list?page=1&limit=10'));
+        .get(Uri.parse('https://picsum.photos/v2/list?page=1&limit=35'));
 
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
@@ -43,10 +46,44 @@ class _ProfilPageState extends BaseStatefulState<ProfilPage> {
     }
   }
 
+  Future<void> fetchRandomImages1() async {
+    final response = await http
+        .get(Uri.parse('https://picsum.photos/v2/list?page=1&limit=10'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+
+      setState(() {
+        randomImages1 = data
+            .map((imageData) => imageData['download_url'] as String)
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load images');
+    }
+  }
+
+  Future<void> fetchRandomImages2() async {
+    final response = await http
+        .get(Uri.parse('https://picsum.photos/v2/list?page=1&limit=14'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+
+      setState(() {
+        randomImages2 = data
+            .map((imageData) => imageData['download_url'] as String)
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load images');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    fetchRandomImages(); // Fetch images when the page loads
+    fetchRandomImages();
   }
 
   @override
@@ -277,7 +314,7 @@ class _ProfilPageState extends BaseStatefulState<ProfilPage> {
                         onTap: () {
                           setState(() {
                             selectedActive = 0;
-
+                            fetchRandomImages1();
                             print(selectedActive.toString());
                           });
                         },
@@ -327,7 +364,7 @@ class _ProfilPageState extends BaseStatefulState<ProfilPage> {
                         onTap: () {
                           setState(() {
                             selectedActive = 2;
-
+                            fetchRandomImages2();
                             print(selectedActive.toString());
                           });
                         },
@@ -357,12 +394,20 @@ class _ProfilPageState extends BaseStatefulState<ProfilPage> {
                     crossAxisSpacing: 2,
                     mainAxisSpacing: 2,
                   ),
-                  itemCount: randomImages.length,
+                  itemCount: (selectedActive == 0)
+                      ? randomImages.length
+                      : (selectedActive == 1)
+                          ? randomImages1.length
+                          : randomImages2.length,
                   itemBuilder: (context, index) {
                     return ClipRRect(
                       // borderRadius: BorderRadius.circular(10),
                       child: Image.network(
-                        randomImages[index],
+                        (selectedActive == 0)
+                            ? randomImages[index]
+                            : (selectedActive == 1)
+                                ? randomImages1[index]
+                                : randomImages2[index],
                         fit: BoxFit.cover,
                       ),
                     );

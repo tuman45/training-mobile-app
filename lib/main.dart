@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:training/profil/profil_page.dart';
+import 'package:training/login_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,8 +14,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      initialRoute: '/profil_page',
+      initialRoute: '/login_page',
       routes: {
+        '/login_page': (context) => LoginPage(),
         '/profil_page': (context) => ProfilPage(),
       },
     );
